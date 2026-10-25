@@ -1,0 +1,49 @@
+name: Update release data
+
+on:
+  schedule:
+    # 每 12 小时检查一次全部追踪仓库的最新 Release/Tag：
+    # - 版本徽章本身由 Shields.io 实时渲染（缓存约 1 小时），新 Release 几分钟内即可反映；
+    # - README 中的"最近发布"为静态文本，依赖本任务刷新；12 小时的周期确保
+    #   包括 tag 型工具（Go、Python）在内的所有条目都能在 24 小时内反映变化。
+    - cron: "30 1,13 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "config/tools.yaml"
+      - "scripts/**"
+      - ".github/workflows/update-releases.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-release-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch releases and regenerate README
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/update_releases.mjs | tee "${GITHUB_STEP_SUMMARY}"
+        shell: bash
+
+      - name: Commit and push if changed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add README.md data
+            git commit -m "chore(release-data): refresh release info [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+        shell: bash

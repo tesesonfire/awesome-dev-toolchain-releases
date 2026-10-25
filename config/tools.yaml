@@ -1,0 +1,84 @@
+# 集中管理所有被追踪的开发工具。
+# 新增 / 删除工具只需修改本文件，README 表格由 scripts/update_releases.mjs 自动生成。
+# 字段说明见 CONTRIBUTING.md。
+#
+# 注意：值中不要使用 "#" 与 ASCII 冒号开头的键；简介请用一句话中文描述。
+categories:
+  - id: runtimes
+    name: 语言运行时
+    tools:
+      - name: Rust
+        repo: rust-lang/rust
+        description: 系统级编程语言，注重性能、可靠性与内存安全。
+      - name: Go
+        repo: golang/go
+        description: Google 开源的静态类型编译型语言。
+        badge: tag
+        tag_prefix: go1
+        note: 该项目不发布 GitHub Releases（仅 tags），徽章基于 tag 渲染
+      - name: Python
+        repo: python/cpython
+        description: CPython 解释器，Python 语言的官方参考实现。
+        badge: endpoint
+        tag_prefix: v3
+        note: 主要分发渠道为 python.org；GitHub 上无 Releases（仅 tags），徽章由本仓库 Actions 依据最新稳定 tag 生成
+      - name: Node.js
+        repo: nodejs/node
+        description: 基于 V8 的 JavaScript 运行时。
+      - name: Bun
+        repo: oven-sh/bun
+        description: 一体化 JavaScript 运行时与工具链（运行、打包、测试、包管理）。
+      - name: Deno
+        repo: denoland/deno
+        description: 默认安全的 JavaScript / TypeScript 运行时。
+
+  - id: python-toolchain
+    name: Python 工具链
+    tools:
+      - name: uv
+        repo: astral-sh/uv
+        description: Rust 编写的高速 Python 包与项目管理器。
+      - name: conda
+        repo: conda/conda
+        description: 跨语言、跨平台的包与环境管理器。
+        note: 主分发渠道为 anaconda.org；本条目追踪其 GitHub Releases 作为版本参考
+
+  - id: version-managers
+    name: 版本管理器
+    tools:
+      - name: nvm
+        repo: nvm-sh/nvm
+        description: POSIX（sh/bash/zsh）环境下的 Node.js 版本管理器。
+      - name: nvm-windows
+        repo: coreybutler/nvm-windows
+        description: Windows 下的 Node.js 版本管理器（与 nvm-sh 相互独立的实现）。
+        note: Windows 原生版本，管理工具为 nvm.exe / nvm-no.exe
+
+  - id: github-ecosystem
+    name: GitHub 生态
+    tools:
+      - name: GitHub CLI
+        repo: cli/cli
+        description: GitHub 官方命令行工具 gh，覆盖 PR、Issue、Actions 等工作流。
+
+  - id: cli
+    name: 通用 CLI
+    tools:
+      - name: ripgrep
+        repo: BurntSushi/ripgrep
+        description: 面向目录递归的高速正则搜索工具（rg）。
+      - name: fd
+        repo: sharkdp/fd
+        description: 简单、快速的 find 替代品。
+      - name: bat
+        repo: sharkdp/bat
+        description: 带语法高亮与 Git 集成的 cat 克隆。
+      - name: jq
+        repo: jqlang/jq
+        description: 轻量级命令行 JSON 处理器。
+      - name: yq
+        repo: mikefarah/yq
+        description: 命令行 YAML / XML / CSV 处理器（Go 实现）。
+      - name: fzf
+        repo: junegunn/fzf
+        description: 通用命令行模糊搜索器，可对接任意列表输入。

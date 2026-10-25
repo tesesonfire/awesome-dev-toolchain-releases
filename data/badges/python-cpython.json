@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "label": "最新稳定 tag",
+  "message": "v3.15.1",
+  "color": "blue",
+  "link": [
+    "https://github.com/python/cpython/tags"
+  ]
+}
