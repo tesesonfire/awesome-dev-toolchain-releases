@@ -65,7 +65,7 @@
 | [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `25 天前` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
 | [fzf](https://github.com/junegunn/fzf) | [![fzf latest version](https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag)](https://github.com/junegunn/fzf/releases) | `14 天前` | [`junegunn/fzf`](https://github.com/junegunn/fzf) | 通用命令行模糊搜索器，可对接任意列表输入。 |
 
-> 🕒 数据更新时间（UTC）：**2026-10-25 03:02** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
+> 🕒 数据更新时间（UTC）：**2026-10-25 03:05** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
 >
 > 时间口径：24 小时内 → `24 小时内`；30 天内 → `N 天前`；更早 → `MM-DD`（跨年显示 `YYYY-MM-DD`）。
 > “最新版本”为 semver 排序最高的稳定版本（不含预发布）。无 GitHub Releases 的工具（Go、Python）基于最新稳定 tag，时间为该 tag 的打标/提交时间。
