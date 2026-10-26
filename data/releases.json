@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-26T06:49:32.808Z",
+  "checked_at": "2026-10-26T19:30:18.835Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 17,
@@ -107,9 +107,9 @@
     {
       "repo": "cli/cli",
       "category": "GitHub 生态",
-      "tag": "v2.103.2",
-      "published_at": "2026-10-23T20:24:12Z",
-      "release_url": "https://github.com/cli/cli/releases/tag/v2.103.2",
+      "tag": "v2.103.3",
+      "published_at": "2026-10-26T19:20:08Z",
+      "release_url": "https://github.com/cli/cli/releases/tag/v2.103.3",
       "badge_url": "https://img.shields.io/github/v/release/cli/cli?sort=semver&display_name=tag",
       "issue": null,
       "note": null
