@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-25T17:11:06.182Z",
+  "checked_at": "2026-10-26T06:49:32.808Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 17,
@@ -27,8 +27,8 @@
     {
       "repo": "python/cpython",
       "category": "语言运行时",
-      "tag": "v3.15.1",
-      "published_at": "2026-10-21T05:55:12Z",
+      "tag": "v3.15.2",
+      "published_at": "2026-10-25T16:57:52Z",
       "release_url": "https://github.com/python/cpython/tags",
       "badge_url": "https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftesesonfire%2Fawesome-dev-toolchain-releases%2Fmain%2Fdata%2Fbadges%2Fpython-cpython.json",
       "issue": null,
