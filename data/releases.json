@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-28T07:15:51.169Z",
+  "checked_at": "2026-10-28T19:01:51.471Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 17,
@@ -37,9 +37,9 @@
     {
       "repo": "nodejs/node",
       "category": "语言运行时",
-      "tag": "v26.12.1",
-      "published_at": "2026-10-21T10:38:29Z",
-      "release_url": "https://github.com/nodejs/node/releases/tag/v26.12.1",
+      "tag": "v26.13.0",
+      "published_at": "2026-10-28T16:57:41Z",
+      "release_url": "https://github.com/nodejs/node/releases/tag/v26.13.0",
       "badge_url": "https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag",
       "issue": null,
       "note": null
