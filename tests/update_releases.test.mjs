@@ -23,6 +23,8 @@ import {
   resolveConcurrency,
   withRetry,
   isRetryable,
+  latestRelease,
+  latestTag,
   loadPreviousSnapshot,
 } from "../scripts/update_releases.mjs";
 
@@ -186,6 +188,26 @@ test("buildRow 的仓库链接指向 releases 或 tags", () => {
 test("buildRow 在抓取异常时用 — 占位并保留 ⚠️ 说明", () => {
   const row = buildRow({ name: "X", repo: "a/b", description: "d" }, { issue: "仓库不存在或不可访问（404）" });
   assert.match(row, /⚠️ 仓库不存在/);
+  assert.match(row, /\| — \|/);
+});
+
+test("buildRow 对回退到快照的行仍显示相对时间并标记陈旧", () => {
+  // 回归：曾按 info.issue 判断时间列，导致"抓取失败但已回退到旧快照"的行丢掉真实发布时间
+  const info = {
+    issue: "抓取失败：GitHub API 限流",
+    tag: "v1.0.0",
+    publishedAt: "2026-10-01T00:00:00Z",
+    stale: true,
+    relTime: "30 天前",
+  };
+  const row = buildRow({ name: "X", repo: "a/b", description: "d" }, info);
+  assert.match(row, /`30 天前` ⏳/, "应显示相对时间并加陈旧标记");
+  assert.doesNotMatch(row, /\| — \|/, "不应退化成 —");
+  assert.match(row, /⚠️ 抓取失败/, "异常说明仍要保留");
+});
+
+test("buildRow 对无发布时间的条目显示 —", () => {
+  const row = buildRow({ name: "X", repo: "a/b", description: "d" }, { relTime: "—" });
   assert.match(row, /\| — \|/);
 });
 
@@ -386,4 +408,116 @@ test("loadPreviousSnapshot 读取上次快照，文件缺失或损坏时返回�
   assert.equal(map.get("a/b").publishedAt, "2026-10-01T00:00:00Z");
   assert.equal(map.get("c/d").tag, null);
   rmSync(dirname(tmp), { recursive: true, force: true });
+});
+
+// ---------------------------------------------------------------------------
+// 选版逻辑：通过注入 fetch 模拟 GitHub API（覆盖过滤、翻页、时间取值）
+// ---------------------------------------------------------------------------
+
+/** 构造一个按 URL 返回固定 JSON 的假 fetch，并记录请求过的 URL */
+function fakeFetch(handler) {
+  const calls = [];
+  const impl = async (url) => {
+    calls.push(String(url));
+    const body = handler(String(url));
+    if (body === undefined) return { ok: false, status: 404, headers: new Map(), json: async () => ({}) };
+    return { ok: true, status: 200, headers: new Map(), json: async () => body };
+  };
+  impl.calls = calls;
+  return impl;
+}
+
+const rel = (tag, publishedAt, extra = {}) => ({
+  tag_name: tag,
+  published_at: publishedAt,
+  html_url: `https://github.com/x/y/releases/tag/${tag}`,
+  draft: false,
+  prerelease: false,
+  ...extra,
+});
+
+test("latestRelease 在预发布与草稿中挑出最高稳定版", async () => {
+  const ff = fakeFetch((url) => {
+    if (url.includes("/releases")) {
+      return [
+        rel("v2.0.0-rc.1", "2026-10-20T00:00:00Z", { prerelease: true }),
+        rel("v1.9.0", "2026-10-10T00:00:00Z"),
+        rel("v9.9.9", "2026-10-25T00:00:00Z", { draft: true }),
+        rel("v1.10.0", "2026-10-15T00:00:00Z"),
+      ];
+    }
+    return undefined;
+  });
+  const info = await latestRelease({ repo: "x/y" }, "", ff);
+  assert.equal(info.tag, "v1.10.0", "应忽略 prerelease 与 draft，并按数值比较而非字典序");
+  assert.equal(info.publishedAt, "2026-10-15T00:00:00Z");
+});
+
+test("latestRelease 在多发布线时翻页找到最高 semver", async () => {
+  // 第一页全是 v11 的补丁，第二页才出现 v12 —— 只看第一页会选错
+  const page1 = Array.from({ length: 100 }, (_, i) => rel(`v11.0.${i}`, "2026-10-20T00:00:00Z"));
+  const page2 = [rel("v12.1.0", "2026-10-27T00:00:00Z"), rel("v10.34.9", "2026-10-19T00:00:00Z")];
+  const ff = fakeFetch((url) => {
+    const m = url.match(/[?&]page=(\d+)/);
+    const page = m ? Number(m[1]) : 1;
+    if (page === 1) return page1;
+    if (page === 2) return page2;
+    return [];
+  });
+  const info = await latestRelease({ repo: "x/y" }, "", ff);
+  assert.equal(info.tag, "v12.1.0");
+  assert.equal(ff.calls.filter((u) => u.includes("/releases?")).length, 2, "应翻到第二页并停止");
+});
+
+test("latestRelease 遇到 404 返回 issue 而不是抛错", async () => {
+  const ff = fakeFetch(() => undefined);
+  const info = await latestRelease({ repo: "no/such" }, "", ff);
+  assert.match(info.issue, /404/);
+});
+
+test("latestRelease 在没有稳定版本时给出 issue", async () => {
+  const ff = fakeFetch((url) => (url.includes("/releases") ? [rel("v1.0.0-rc.1", "2026-10-20T00:00:00Z", { prerelease: true })] : undefined));
+  const info = await latestRelease({ repo: "x/y" }, "", ff);
+  assert.match(info.issue, /没有可用的稳定 Release/);
+});
+
+test("latestRelease 报告与 /releases/latest 语义的差异", async () => {
+  // 第一页第一条是最近发布但 semver 更低的 v10.x，最高 semver 是 v12.x
+  const ff = fakeFetch((url) => {
+    if (url.includes("/releases")) {
+      return [rel("v10.34.9", "2026-10-27T00:00:00Z"), rel("v12.1.0", "2026-10-20T00:00:00Z")];
+    }
+    return undefined;
+  });
+  const info = await latestRelease({ repo: "x/y" }, "", ff);
+  assert.equal(info.tag, "v12.1.0");
+  assert.equal(info.apiLatestEndpointTag, "v10.34.9", "应暴露 latest 端点会指向的版本，供报告标注差异");
+});
+
+test("latestTag 按前缀过滤并排除预发布 tag", async () => {
+  const refs = [
+    { ref: "refs/tags/go1.27.3", object: { sha: "sha3", type: "commit" } },
+    { ref: "refs/tags/go1.28rc1", object: { sha: "sharc", type: "commit" } },
+    { ref: "refs/tags/go1.26.0", object: { sha: "sha1", type: "commit" } },
+  ];
+  const ff = fakeFetch((url) => {
+    if (url.includes("matching-refs")) return refs;
+    if (url.includes("/commits/sha3")) return { commit: { committer: { date: "2026-10-20T01:26:06Z" } } };
+    return undefined;
+  });
+  const info = await latestTag({ repo: "x/y", tag_prefix: "go1" }, "", ff);
+  assert.equal(info.tag, "go1.27.3", "go1.28rc1 是预发布，应排除");
+  assert.equal(info.publishedAt, "2026-10-20T01:26:06Z", "无 annotated tag 时回落到提交时间");
+  assert.match(info.url, /\/tags$/);
+});
+
+test("latestTag 对 annotated tag 取 tagger 时间", async () => {
+  const ff = fakeFetch((url) => {
+    if (url.includes("matching-refs")) return [{ ref: "refs/tags/v3.15.2", object: { sha: "t1", type: "tag" } }];
+    if (url.includes("/git/tags/t1")) return { tagger: { date: "2026-10-21T05:55:12Z" } };
+    return undefined;
+  });
+  const info = await latestTag({ repo: "x/y", tag_prefix: "v3" }, "", ff);
+  assert.equal(info.tag, "v3.15.2");
+  assert.equal(info.publishedAt, "2026-10-21T05:55:12Z");
 });

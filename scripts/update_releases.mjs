@@ -19,7 +19,7 @@
  * 环境：GITHUB_TOKEN（可选；未认证限额 60 次/小时，认证后 5000 次/小时）
  *       UPDATE_CONCURRENCY（可选；并发抓取的仓库数，默认 4，取值 1-8）
  *
- * 测试：node --test tests/
+ * 测试：npm test（等价于 node --test tests/update_releases.test.mjs）
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -353,11 +353,11 @@ export async function withRetry(fn, { attempts = 3, baseDelayMs = 400, onRetry }
   throw lastErr;
 }
 
-/** 带上 HTTP 状态码的请求（供 isRetryable 判断） */
-async function ghRequest(url, token) {
+/** 带上 HTTP 状态码的请求（供 isRetryable 判断）。fetchImpl 可注入，便于单测模拟 API。 */
+async function ghRequest(url, token, fetchImpl = fetch) {
   let res;
   try {
-    res = await fetch(url, { headers: ghHeaders(token) });
+    res = await fetchImpl(url, { headers: ghHeaders(token) });
   } catch (err) {
     const e = new Error(`网络错误：${err.message}`);
     e.cause = err;
@@ -371,9 +371,9 @@ async function ghRequest(url, token) {
 }
 
 /** ghJson + 自动重试 */
-async function ghJsonRetry(url, token, opts) {
+async function ghJsonRetry(url, token, opts, fetchImpl = fetch) {
   try {
-    return await withRetry(() => ghRequest(url, token), opts);
+    return await withRetry(() => ghRequest(url, token, fetchImpl), opts);
   } catch (err) {
     if (err.status === 404) return { notFound: true };
     if (err.status === 403 || err.status === 429) {
@@ -387,13 +387,15 @@ async function ghJsonRetry(url, token, opts) {
 }
 
 /** badge: release —— 取 semver 最大的稳定（非 draft、非 prerelease）Release，口径与 Shields sort=semver 一致 */
-async function latestRelease(tool, token) {
+async function latestRelease(tool, token, fetchImpl = fetch) {
   const cands = [];
   let firstPage = [];
+  let bestSoFar = null;
   // Releases 按创建时间倒序返回。多发布线项目（如 pnpm 同时维护 v10/v11/v12）的最高 semver
-  // 可能不在第一页，因此翻页直到该页出现版本号低于当前最优的候选为止。
+  // 可能不在第一页，因此继续翻页，直到"本页最高版本都不如之前已知的最优版本"为止 ——
+  // 说明创建时间更早的页面不可能再贡献更高 semver。
   for (let page = 1; page <= MAX_RELEASE_PAGES; page++) {
-    const r = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/releases?per_page=100&page=${page}`, token);
+    const r = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/releases?per_page=100&page=${page}`, token, undefined, fetchImpl);
     if (r.notFound) return { issue: "仓库不存在或不可访问（404）" };
     if (!Array.isArray(r.data) || r.data.length === 0) break;
     if (page === 1) firstPage = r.data;
@@ -408,8 +410,9 @@ async function latestRelease(tool, token) {
       if (!pageBest || cmpVersion(v, pageBest) > 0) pageBest = v;
     }
     if (r.data.length < 100) break;
-    const overall = cands.length ? cands.reduce((m, c) => (cmpVersion(c.v, m) > 0 ? c.v : m), cands[0].v) : null;
-    if (overall && pageBest && cmpVersion(pageBest, overall) < 0) break;
+    // 用"本页最优"与"本页之前的最优"比较；本页无候选时也无法判断，继续翻页
+    if (pageBest && bestSoFar && cmpVersion(pageBest, bestSoFar) < 0) break;
+    if (pageBest && (!bestSoFar || cmpVersion(pageBest, bestSoFar) > 0)) bestSoFar = pageBest;
   }
   if (!cands.length) return { issue: "该仓库没有可用的稳定 Release" };
   cands.sort((a, b) => cmpVersion(a.v, b.v));
@@ -430,7 +433,7 @@ async function latestRelease(tool, token) {
  * badge: tag / endpoint —— 该仓库无 GitHub Releases，改用 git refs 抓取最新稳定 tag。
  * 返回 tag 名与该 tag 的打标/提交时间（作为"最近发布"的近似值）。
  */
-async function latestTag(tool, token) {
+async function latestTag(tool, token, fetchImpl = fetch) {
   const prefix = tool.tag_prefix || "";
   const cands = [];
   let lastError = null;
@@ -442,6 +445,8 @@ async function latestTag(tool, token) {
       r = await ghJsonRetry(
         `${API_BASE}/repos/${tool.repo}/git/matching-refs/tags/${prefix}?per_page=100&page=${page}`,
         token,
+        undefined,
+        fetchImpl,
       );
     } catch (err) {
       lastError = err.message;
@@ -470,11 +475,11 @@ async function latestTag(tool, token) {
   let date = null;
   if (best.type === "tag") {
     // annotated tag：ref 指向 tag 对象，取 tagger 日期
-    const t = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/git/tags/${best.sha}`, token);
+    const t = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/git/tags/${best.sha}`, token, undefined, fetchImpl);
     if (!t.notFound && t.data) date = t.data.tagger?.date || null;
   }
   if (!date) {
-    const c = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/commits/${best.sha}`, token);
+    const c = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/commits/${best.sha}`, token, undefined, fetchImpl);
     if (!c.notFound && c.data) date = c.data.commit?.committer?.date || null;
   }
   return { tag: best.name, publishedAt: date, url: `https://github.com/${tool.repo}/tags` };
@@ -527,7 +532,10 @@ function buildRow(tool, info) {
   const descParts = [clean(tool.description) || "—"];
   if (tool.note) descParts.push(`📌 ${clean(tool.note)}`);
   if (info?.issue) descParts.push(`⚠️ ${clean(info.issue)}`);
-  const time = info?.issue || !info ? "—" : `\`${info.relTime}\``;
+  // 时间列取决于"是否拿到了可用的相对时间"，而不是"是否有异常"：抓取失败但回退到上次快照时
+  // 我们仍然持有真实的发布时间，此时显示相对时间并加 ⏳ 标记，比显示 — 更有信息量。
+  const hasTime = Boolean(info) && info.relTime !== undefined && info.relTime !== "—";
+  const time = hasTime ? `\`${info.relTime}\`${info.stale ? " ⏳" : ""}` : "—";
   return (
     `| [${clean(tool.name)}](${repoUrl}) ` +
     `| [![${clean(tool.name)} latest version](${badgeUrl(tool)})](${linkTarget}) ` +
@@ -675,7 +683,7 @@ async function main() {
       release_url: info.url ?? null,
       badge_url: null,
       issue: info.issue ?? null,
-      stale: info.stale ? true : undefined,
+      stale: info.stale === true,
       note: info.apiLatestEndpointTag && info.tag && info.apiLatestEndpointTag !== info.tag
         ? `GitHub /releases/latest 指向 ${info.apiLatestEndpointTag}`
         : null,

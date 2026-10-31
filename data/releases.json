@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-31T10:26:50.144Z",
+  "checked_at": "2026-10-31T11:45:16.509Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -12,6 +12,7 @@
       "release_url": "https://github.com/rust-lang/rust/releases/tag/1.99.1",
       "badge_url": "https://img.shields.io/github/v/release/rust-lang/rust?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -22,6 +23,7 @@
       "release_url": "https://github.com/golang/go/tags",
       "badge_url": "https://img.shields.io/github/v/tag/golang/go?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -32,6 +34,7 @@
       "release_url": "https://github.com/python/cpython/tags",
       "badge_url": "https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftesesonfire%2Fawesome-dev-toolchain-releases%2Fmain%2Fdata%2Fbadges%2Fpython-cpython.json",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -42,6 +45,7 @@
       "release_url": "https://github.com/nodejs/node/releases/tag/v26.13.0",
       "badge_url": "https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -52,6 +56,7 @@
       "release_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.4",
       "badge_url": "https://img.shields.io/github/v/release/oven-sh/bun?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -62,6 +67,7 @@
       "release_url": "https://github.com/denoland/deno/releases/tag/v2.9.8",
       "badge_url": "https://img.shields.io/github/v/release/denoland/deno?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -72,6 +78,7 @@
       "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.17.0",
       "badge_url": "https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -82,6 +89,7 @@
       "release_url": "https://github.com/astral-sh/uv/releases/tag/0.13.6",
       "badge_url": "https://img.shields.io/github/v/release/astral-sh/uv?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -92,6 +100,7 @@
       "release_url": "https://github.com/conda/conda/releases/tag/26.9.4",
       "badge_url": "https://img.shields.io/github/v/release/conda/conda?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -102,6 +111,7 @@
       "release_url": "https://github.com/nvm-sh/nvm/releases/tag/v0.40.8",
       "badge_url": "https://img.shields.io/github/v/release/nvm-sh/nvm?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -112,6 +122,7 @@
       "release_url": "https://github.com/nvm-windows/nvm/releases/tag/v2.0.1",
       "badge_url": "https://img.shields.io/github/v/release/coreybutler/nvm-windows?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -122,6 +133,7 @@
       "release_url": "https://github.com/cli/cli/releases/tag/v2.103.3",
       "badge_url": "https://img.shields.io/github/v/release/cli/cli?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -132,6 +144,7 @@
       "release_url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
       "badge_url": "https://img.shields.io/github/v/release/BurntSushi/ripgrep?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -142,6 +155,7 @@
       "release_url": "https://github.com/sharkdp/fd/releases/tag/v10.5.0",
       "badge_url": "https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -152,6 +166,7 @@
       "release_url": "https://github.com/sharkdp/bat/releases/tag/v0.26.1",
       "badge_url": "https://img.shields.io/github/v/release/sharkdp/bat?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -162,6 +177,7 @@
       "release_url": "https://github.com/jqlang/jq/releases/tag/jq-1.8.2",
       "badge_url": "https://img.shields.io/github/v/release/jqlang/jq?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -172,6 +188,7 @@
       "release_url": "https://github.com/mikefarah/yq/releases/tag/v4.54.1",
       "badge_url": "https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     },
     {
@@ -182,6 +199,7 @@
       "release_url": "https://github.com/junegunn/fzf/releases/tag/v0.74.5",
       "badge_url": "https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag",
       "issue": null,
+      "stale": false,
       "note": null
     }
   ]

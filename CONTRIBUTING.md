@@ -96,5 +96,6 @@ git push
 3. "最近发布"的相对时间口径由 `scripts/update_releases.mjs` 的 `relTime()` 统一实现（24 小时内 / N 天前 / MM-DD）；
 4. Actions 工作流保持单文件、少量步骤；复杂逻辑全部收敛在脚本中，便于本地复现；
 5. 对无 GitHub Releases 的工具，条目必须带 `note` 说明降级方式，不得用 GitHub 数据冒充其官方发布渠道（如 conda 的 anaconda.org）；
-6. 纯逻辑（YAML 解析、semver 排序、时间口径、配置校验、并发/重试）改动必须同步更新 `tests/update_releases.test.mjs` —— CI 会先跑单测再刷新数据；
-7. 单个仓库抓取失败时必须沿用上次快照并标注，任何改动都不得让"限流 / 网络抖动"把已发布版本冲成 `—`。
+6. 纯逻辑（YAML 解析、semver 排序、选版逻辑、时间口径、配置校验、并发/重试）改动必须同步更新 `tests/update_releases.test.mjs` —— CI 会先跑单测再刷新数据；选版相关的改动请用注入 `fetchImpl` 的方式补用例，不要依赖真实网络；
+7. 单个仓库抓取失败时必须沿用上次快照并标注，任何改动都不得让"限流 / 网络抖动"把已发布版本冲成 `—`；
+8. GitHub Actions 的 action 版本需保持受支持（当前 `checkout@v5` / `setup-node@v5`），Node 版本与 `package.json` 的 `engines` 保持兼容。

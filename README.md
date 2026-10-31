@@ -18,7 +18,9 @@
 - 🧩 **单一配置源** —— 新增 / 删除工具只需修改 `config/tools.yaml`，表格结构由脚本维护，README 无需手工编辑；
 - 📦 **数据留痕** —— 每次抓取的版本快照存档于 [`data/releases.json`](data/releases.json)，可在提交历史中回溯；
 - 🛡️ **抓取失败不丢数据** —— 单个仓库抓取失败（限流 / 网络抖动）时沿用上次快照的版本并在状态列标注，不会把整行覆盖成 `—`；
-- 🧪 **零依赖测试** —— 解析、semver 排序、时间口径、配置校验、并发与重试均有 `node:test` 单测，CI 先跑测试再刷新数据。
+- 🧪 **零依赖测试** —— 39 项 `node:test` 单测覆盖解析、semver 排序、选版逻辑（含多发布线翻页）、时间口径、配置校验、并发与重试；CI 先跑测试再刷新数据。
+
+> 表格中的 `⏳` 表示该行本次抓取失败、显示的是上一次成功抓取到的发布时间（版本仍可参考，但可能已过期）。
 
 ## 📊 工具列表
 
@@ -73,7 +75,7 @@
 | [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `09-29` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
 | [fzf](https://github.com/junegunn/fzf) | [![fzf latest version](https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag)](https://github.com/junegunn/fzf/releases) | `20 天前` | [`junegunn/fzf`](https://github.com/junegunn/fzf) | 通用命令行模糊搜索器，可对接任意列表输入。 |
 
-> 🕒 数据更新时间（UTC）：**2026-10-31 10:26** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
+> 🕒 数据更新时间（UTC）：**2026-10-31 11:45** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
 >
 > 时间口径：24 小时内 → `24 小时内`；30 天内 → `N 天前`；更早 → `MM-DD`（跨年显示 `YYYY-MM-DD`）。
 > “最新版本”为 semver 排序最高的稳定版本（不含预发布）。无 GitHub Releases 的工具（Go、Python）基于最新稳定 tag，时间为该 tag 的打标/提交时间。
