@@ -17,6 +17,9 @@
  *
  * 用法：node scripts/update_releases.mjs [--dry-run]
  * 环境：GITHUB_TOKEN（可选；未认证限额 60 次/小时，认证后 5000 次/小时）
+ *       UPDATE_CONCURRENCY（可选；并发抓取的仓库数，默认 4，取值 1-8）
+ *
+ * 测试：node --test tests/
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -31,8 +34,38 @@ const DATA_PATH = join(DATA_DIR, "releases.json");
 const MARK_START = "<!-- TOOLCHAIN:START -->";
 const MARK_END = "<!-- TOOLCHAIN:END -->";
 const API_BASE = "https://api.github.com";
-const REPO_SLUG = process.env.GITHUB_REPOSITORY || "tesesonfire/awesome-dev-toolchain-releases";
+export const REPO_SLUG = process.env.GITHUB_REPOSITORY || "tesesonfire/awesome-dev-toolchain-releases";
 const DRY_RUN = process.argv.includes("--dry-run");
+/** 单仓库最多翻页数（100 条/页），防止异常仓库耗尽 API 限额 */
+const MAX_RELEASE_PAGES = 5;
+const MAX_TAG_PAGES = 12;
+
+/** 并发抓取的仓库数（默认 4；未认证时降到 2，配额仅 60 次/小时，并发过高只会更快撞墙） */
+export function resolveConcurrency(raw = process.env.UPDATE_CONCURRENCY, authenticated = Boolean(process.env.GITHUB_TOKEN)) {
+  const n = Number(raw);
+  const fallback = authenticated ? 4 : 2;
+  if (raw === undefined || raw === null || raw === "" || !Number.isInteger(n) || n < 1) return fallback;
+  return Math.min(n, 8);
+}
+
+/** 固定并发上限地处理数组，返回值顺序与入参一致 */
+export async function mapLimit(items, limit, fn) {
+  const results = new Array(items.length);
+  let cursor = 0;
+  const size = Math.max(1, Math.min(Math.trunc(limit) || 1, items.length));
+  const worker = async () => {
+    while (true) {
+      const i = cursor++;
+      if (i >= items.length) return;
+      results[i] = await fn(items[i], i);
+    }
+  };
+  await Promise.all(Array.from({ length: size }, worker));
+  return results;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 
 // ---------------------------------------------------------------------------
 // 极简 YAML 子集解析器：仅支持 config/tools.yaml 用到的语法
@@ -159,25 +192,86 @@ function parseConfig(text) {
   return top;
 }
 
-function validateConfig(cfg) {
-  if (!Array.isArray(cfg.categories) || cfg.categories.length === 0) {
+const TOOL_FIELDS = new Set(["name", "repo", "description", "badge", "tag_prefix", "include_prereleases", "note"]);
+const BADGE_MODES = new Set(["release", "tag", "endpoint"]);
+
+/** 表格单元格内的非法字符会破坏 Markdown 结构，必须在配置层拒绝而不是静默替换 */
+function tableUnsafeChars(value) {
+  const bad = [];
+  if (/[|\r\n]/.test(value)) bad.push("| 或换行");
+  if (value.includes("<!--")) bad.push("<!--");
+  return bad;
+}
+
+export function validateConfig(cfg) {
+  if (!cfg || typeof cfg !== "object" || !Array.isArray(cfg.categories) || cfg.categories.length === 0) {
     throw new Error('配置缺少顶层 "categories:" 列表');
   }
-  const seen = new Set();
+  const extraTop = Object.keys(cfg).filter((k) => k !== "categories");
+  if (extraTop.length) throw new Error(`配置存在未知顶层字段: ${extraTop.join(", ")}`);
+
+  const seenRepo = new Set();
+  const seenName = new Set();
+  const seenCatId = new Set();
   let count = 0;
+
   for (const cat of cfg.categories) {
     if (!cat.id || !cat.name) throw new Error(`分类缺少 id 或 name: ${JSON.stringify(cat)}`);
+    const extraCat = Object.keys(cat).filter((k) => !["id", "name", "tools"].includes(k));
+    if (extraCat.length) throw new Error(`分类 ${cat.id} 存在未知字段: ${extraCat.join(", ")}`);
+    if (seenCatId.has(cat.id)) throw new Error(`分类 id 重复: ${cat.id}`);
+    seenCatId.add(cat.id);
+    if (tableUnsafeChars(String(cat.name)).length) {
+      throw new Error(`分类 ${cat.id} 的 name 含非法字符（${tableUnsafeChars(String(cat.name)).join(", ")}）`);
+    }
     if (!Array.isArray(cat.tools) || cat.tools.length === 0) {
       throw new Error(`分类 ${cat.id} 下没有任何工具`);
     }
+
     for (const t of cat.tools) {
       if (!t.name || !t.repo) throw new Error(`分类 ${cat.id} 下存在缺少 name/repo 的条目`);
       if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(t.repo)) throw new Error(`非法 repo 字段: ${t.repo}`);
-      if (seen.has(t.repo)) throw new Error(`重复追踪同一仓库: ${t.repo}`);
-      seen.add(t.repo);
-      if (t.badge && !["release", "tag", "endpoint"].includes(t.badge)) {
-        throw new Error(`${t.repo}: badge 仅支持 release / tag / endpoint`);
+
+      const extra = Object.keys(t).filter((k) => !TOOL_FIELDS.has(k));
+      if (extra.length) throw new Error(`${t.repo}: 存在未知字段 ${extra.join(", ")}（可选字段见 CONTRIBUTING.md）`);
+
+      if (seenRepo.has(t.repo)) throw new Error(`重复追踪同一仓库: ${t.repo}`);
+      seenRepo.add(t.repo);
+
+      // 工具名会同时出现在表格首列与徽章 alt 文本中，重复会造成表格难以辨识
+      const nameKey = String(t.name).trim().toLowerCase();
+      if (seenName.has(nameKey)) throw new Error(`工具名重复: ${t.name}`);
+      seenName.add(nameKey);
+
+      if (!t.description) throw new Error(`${t.repo}: 缺少 description`);
+      const badDesc = tableUnsafeChars(String(t.description));
+      if (badDesc.length) throw new Error(`${t.repo}: description 含非法字符（${badDesc.join(", ")}）`);
+      if (t.note !== undefined && t.note !== null) {
+        const badNote = tableUnsafeChars(String(t.note));
+        if (badNote.length) throw new Error(`${t.repo}: note 含非法字符（${badNote.join(", ")}）`);
       }
+
+      if (t.badge !== undefined && t.badge !== null) {
+        if (!BADGE_MODES.has(t.badge)) {
+          throw new Error(`${t.repo}: badge 仅支持 release / tag / endpoint`);
+        }
+      }
+      if (t.include_prereleases !== undefined && typeof t.include_prereleases !== "boolean") {
+        throw new Error(`${t.repo}: include_prereleases 必须为 true / false`);
+      }
+      if (t.tag_prefix !== undefined && t.tag_prefix !== null) {
+        if (typeof t.tag_prefix !== "string" || !t.tag_prefix.trim()) {
+          throw new Error(`${t.repo}: tag_prefix 必须为非空字符串`);
+        }
+        if (/[\s?#]/.test(t.tag_prefix)) {
+          throw new Error(`${t.repo}: tag_prefix 不能含空白、? 或 #（会破坏 matching-refs URL）`);
+        }
+      }
+      // endpoint 徽章由脚本按 tag_prefix 计算稳定 tag，缺 prefix 会扫描全部 refs 导致误判
+      if (t.badge === "endpoint" && !t.tag_prefix) {
+        throw new Error(`${t.repo}: badge 为 endpoint 时必须配置 tag_prefix`);
+      }
+
       count++;
     }
   }
@@ -232,41 +326,103 @@ function ghHeaders(token) {
   return h;
 }
 
-async function ghJson(url, token) {
-  const res = await fetch(url, { headers: ghHeaders(token) });
-  if (res.status === 404) return { notFound: true };
-  if (res.status === 403 || res.status === 429) {
-    const remaining = res.headers.get("x-ratelimit-remaining");
-    throw new Error(`GitHub API 限流（HTTP ${res.status}，remaining=${remaining}）。请设置 GITHUB_TOKEN。`);
+const RETRYABLE_STATUS = new Set([408, 500, 502, 503, 504]);
+const RETRYABLE_NET = new Set(["ECONNRESET", "ETIMEDOUT", "EAI_AGAIN", "ENOTFOUND", "UND_ERR_SOCKET", "UND_ERR_CONNECT_TIMEOUT"]);
+
+export function isRetryable(err) {
+  if (!err) return false;
+  if (RETRYABLE_STATUS.has(Number(err.status))) return true;
+  const code = err.cause?.code || err.code;
+  return RETRYABLE_NET.has(code);
+}
+
+/** 指数退避重试：只重试瞬时故障（网络抖动、5xx、408），限流/404/401 立即失败 */
+export async function withRetry(fn, { attempts = 3, baseDelayMs = 400, onRetry } = {}) {
+  let lastErr;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fn(attempt);
+    } catch (err) {
+      lastErr = err;
+      if (attempt === attempts || !isRetryable(err)) throw err;
+      const wait = baseDelayMs * 2 ** (attempt - 1);
+      if (onRetry) onRetry(err, attempt, wait);
+      await sleep(wait);
+    }
   }
-  if (res.status === 401) throw new Error("GitHub API 401：GITHUB_TOKEN 无效");
-  if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}: ${url}`);
-  return { data: await res.json() };
+  throw lastErr;
+}
+
+/** 带上 HTTP 状态码的请求（供 isRetryable 判断） */
+async function ghRequest(url, token) {
+  let res;
+  try {
+    res = await fetch(url, { headers: ghHeaders(token) });
+  } catch (err) {
+    const e = new Error(`网络错误：${err.message}`);
+    e.cause = err;
+    throw e;
+  }
+  if (res.ok) return { data: await res.json() };
+  const e = new Error(res.status === 404 ? "notFound" : `HTTP ${res.status}`);
+  e.status = res.status;
+  e.headers = res.headers;
+  throw e;
+}
+
+/** ghJson + 自动重试 */
+async function ghJsonRetry(url, token, opts) {
+  try {
+    return await withRetry(() => ghRequest(url, token), opts);
+  } catch (err) {
+    if (err.status === 404) return { notFound: true };
+    if (err.status === 403 || err.status === 429) {
+      const remaining = err.headers?.get?.("x-ratelimit-remaining") ?? "?";
+      throw new Error(`GitHub API 限流（HTTP ${err.status}，remaining=${remaining}）。请设置 GITHUB_TOKEN。`);
+    }
+    if (err.status === 401) throw new Error("GitHub API 401：GITHUB_TOKEN 无效");
+    if (err.status) throw new Error(`GitHub API HTTP ${err.status}: ${url}`);
+    throw err;
+  }
 }
 
 /** badge: release —— 取 semver 最大的稳定（非 draft、非 prerelease）Release，口径与 Shields sort=semver 一致 */
 async function latestRelease(tool, token) {
-  const r = await ghJson(`${API_BASE}/repos/${tool.repo}/releases?per_page=100`, token);
-  if (r.notFound) return { issue: "仓库不存在或不可访问（404）" };
   const cands = [];
-  for (const rel of r.data) {
-    if (rel.draft) continue;
-    if (rel.prerelease && tool.include_prereleases !== true) continue;
-    const v = parseVersion(rel.tag_name);
-    if (!v) continue;
-    cands.push({ v, rel });
+  let firstPage = [];
+  // Releases 按创建时间倒序返回。多发布线项目（如 pnpm 同时维护 v10/v11/v12）的最高 semver
+  // 可能不在第一页，因此翻页直到该页出现版本号低于当前最优的候选为止。
+  for (let page = 1; page <= MAX_RELEASE_PAGES; page++) {
+    const r = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/releases?per_page=100&page=${page}`, token);
+    if (r.notFound) return { issue: "仓库不存在或不可访问（404）" };
+    if (!Array.isArray(r.data) || r.data.length === 0) break;
+    if (page === 1) firstPage = r.data;
+
+    let pageBest = null;
+    for (const rel of r.data) {
+      if (rel.draft) continue;
+      if (rel.prerelease && tool.include_prereleases !== true) continue;
+      const v = parseVersion(rel.tag_name);
+      if (!v) continue;
+      cands.push({ v, rel });
+      if (!pageBest || cmpVersion(v, pageBest) > 0) pageBest = v;
+    }
+    if (r.data.length < 100) break;
+    const overall = cands.length ? cands.reduce((m, c) => (cmpVersion(c.v, m) > 0 ? c.v : m), cands[0].v) : null;
+    if (overall && pageBest && cmpVersion(pageBest, overall) < 0) break;
   }
   if (!cands.length) return { issue: "该仓库没有可用的稳定 Release" };
   cands.sort((a, b) => cmpVersion(a.v, b.v));
   const best = cands[cands.length - 1].rel;
-  let endpointTag = null;
-  const lr = await ghJson(`${API_BASE}/repos/${tool.repo}/releases/latest`, token);
-  if (!lr.notFound && lr.data) endpointTag = lr.data.tag_name;
+  // GitHub 的 /releases/latest 语义是"最近创建的非 draft、非 prerelease 版本"，
+  // 与按 semver 取最大可能不同（多发布线项目）。releases 列表本就按 created_at 倒序，
+  // 因此直接复用已抓取的数据推导，省掉一次 API 请求（未认证配额只有 60 次/小时）。
+  const apiLatest = firstPage.find((rel) => !rel.draft && !rel.prerelease);
   return {
     tag: best.tag_name,
     publishedAt: best.published_at || best.created_at,
     url: best.html_url,
-    apiLatestEndpointTag: endpointTag,
+    apiLatestEndpointTag: apiLatest ? apiLatest.tag_name : null,
   };
 }
 
@@ -278,13 +434,23 @@ async function latestTag(tool, token) {
   const prefix = tool.tag_prefix || "";
   const cands = [];
   let lastError = null;
-  for (let page = 1; page <= 12; page++) {
-    const r = await ghJson(
-      `${API_BASE}/repos/${tool.repo}/git/matching-refs/tags/${prefix}?per_page=100&page=${page}`,
-      token,
-    );
+  // git refs 按 ref 名字典序分页，后续页只会出现更小的语义化前缀，
+  // 因此某页没有贡献新的最优候选时即可停止翻页。
+  for (let page = 1; page <= MAX_TAG_PAGES; page++) {
+    let r;
+    try {
+      r = await ghJsonRetry(
+        `${API_BASE}/repos/${tool.repo}/git/matching-refs/tags/${prefix}?per_page=100&page=${page}`,
+        token,
+      );
+    } catch (err) {
+      lastError = err.message;
+      break;
+    }
     if (r.notFound) return { issue: "仓库不存在或不可访问（404）" };
     if (!Array.isArray(r.data) || r.data.length === 0) break;
+
+    const before = cands.length;
     for (const ref of r.data) {
       const name = ref.ref.replace(/^refs\/tags\//, "");
       const v = parseVersion(name);
@@ -292,6 +458,8 @@ async function latestTag(tool, token) {
       if (v[3] !== 1 && tool.include_prereleases !== true) continue; // 排除 rc/alpha/beta 等
       cands.push({ v, name, sha: ref.object.sha, type: ref.object.type });
     }
+    if (r.data.length < 100) break;
+    if (cands.length === before) break; // 本页没有任何可用候选，语义化前缀已走完
   }
   if (!cands.length) {
     if (lastError) return { issue: `获取 tags 失败：${lastError}` };
@@ -302,11 +470,11 @@ async function latestTag(tool, token) {
   let date = null;
   if (best.type === "tag") {
     // annotated tag：ref 指向 tag 对象，取 tagger 日期
-    const t = await ghJson(`${API_BASE}/repos/${tool.repo}/git/tags/${best.sha}`, token);
+    const t = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/git/tags/${best.sha}`, token);
     if (!t.notFound && t.data) date = t.data.tagger?.date || null;
   }
   if (!date) {
-    const c = await ghJson(`${API_BASE}/repos/${tool.repo}/commits/${best.sha}`, token);
+    const c = await ghJsonRetry(`${API_BASE}/repos/${tool.repo}/commits/${best.sha}`, token);
     if (!c.notFound && c.data) date = c.data.commit?.committer?.date || null;
   }
   return { tag: best.name, publishedAt: date, url: `https://github.com/${tool.repo}/tags` };
@@ -401,56 +569,93 @@ function spliceReadme(readme, section) {
 // 主流程
 // ---------------------------------------------------------------------------
 
+/** 读取上一次成功写入的快照，用于抓取失败时的回退；文件不存在或损坏时返回空表 */
+export function loadPreviousSnapshot(path = DATA_PATH) {
+  if (!existsSync(path)) return new Map();
+  try {
+    const prev = JSON.parse(readFileSync(path, "utf8"));
+    const map = new Map();
+    for (const t of prev.tools ?? []) {
+      if (t && t.repo) {
+        map.set(t.repo, {
+          tag: t.tag ?? null,
+          publishedAt: t.published_at ?? null,
+          url: t.release_url ?? null,
+        });
+      }
+    }
+    return map;
+  } catch {
+    return new Map();
+  }
+}
+
 async function main() {
   const token = process.env.GITHUB_TOKEN || "";
   const config = parseConfig(readFileSync(CONFIG_PATH, "utf8"));
   const toolCount = validateConfig(config);
   const now = Date.now();
   const checkedAt = new Date(now).toISOString().replace("T", " ").slice(0, 16);
+  const concurrency = resolveConcurrency(process.env.UPDATE_CONCURRENCY, Boolean(token));
+  const previous = loadPreviousSnapshot();
 
   const results = new Map();
   const reportRows = [];
   const issues = [];
+  const stale = [];
 
-  for (const cat of config.categories) {
-    for (const tool of cat.tools) {
-      let info;
-      try {
-        info = modeOf(tool) === "release" ? await latestRelease(tool, token) : await latestTag(tool, token);
-      } catch (err) {
-        info = { issue: `抓取失败：${err.message}` };
-      }
-      info.relTime = relTime(info.publishedAt, now);
-      info.category = cat.name;
-      results.set(tool.repo, info);
+  // 扁平化后并发抓取：结果靠索引回填，顺序与串行执行完全一致
+  const flat = config.categories.flatMap((cat) => cat.tools.map((tool) => ({ cat, tool })));
 
-      if (info.issue) issues.push(`${tool.repo}：${info.issue}`);
-      const divergence =
-        info.apiLatestEndpointTag && info.tag && info.apiLatestEndpointTag !== info.tag
-          ? `（注意：GitHub /releases/latest 指向 ${info.apiLatestEndpointTag}）`
-          : "";
-      reportRows.push(
-        `| ${clean(tool.name)} | ${tool.repo} | ${info.tag ?? "—"} | ${info.relTime} | ${info.issue ? "⚠️ " + info.issue : "✅"}${divergence} |`,
-      );
-
-      // endpoint 徽章数据（badge: endpoint）
-      if (modeOf(tool) === "endpoint" && info.tag) {
-        const badgeJson = {
-          schemaVersion: 1,
-          label: "最新稳定 tag",
-          message: info.tag,
-          color: "blue",
-          link: [`https://github.com/${tool.repo}/tags`],
-        };
-        if (!DRY_RUN) {
-          mkdirSync(BADGES_DIR, { recursive: true });
-          writeFileSync(join(BADGES_DIR, `${keyOf(tool)}.json`), JSON.stringify(badgeJson, null, 2) + "\n");
-        }
-      }
-
-      process.stdout.write(`  ${info.issue ? "⚠" : "✓"} ${tool.repo.padEnd(26)} ${String(info.tag ?? "—").padEnd(14)} ${info.relTime}\n`);
+  await mapLimit(flat, concurrency, async ({ cat, tool }, index) => {
+    let info;
+    try {
+      info = modeOf(tool) === "release" ? await latestRelease(tool, token) : await latestTag(tool, token);
+    } catch (err) {
+      info = { issue: `抓取失败：${err.message}` };
     }
-  }
+    // 抓取失败但历史快照里有数据时，沿用上次成功的值并标注为陈旧数据，
+    // 避免整行被覆盖成 "—"（限流是暂时性的，旧值远比空值有用）。
+    const prev = previous.get(tool.repo);
+    if (info.issue && prev?.tag) {
+      info = { ...info, tag: prev.tag, publishedAt: prev.publishedAt, url: prev.url, stale: true };
+      stale.push(tool.repo);
+    }
+    info.relTime = relTime(info.publishedAt, now);
+    info.category = cat.name;
+
+    if (info.issue) issues.push(`${tool.repo}：${info.issue}`);
+    const divergence =
+      info.apiLatestEndpointTag && info.tag && info.apiLatestEndpointTag !== info.tag
+        ? `（注意：GitHub /releases/latest 指向 ${info.apiLatestEndpointTag}）`
+        : "";
+    const status = info.issue
+      ? `⚠️ ${info.issue}${info.stale ? "（沿用上次成功抓取的版本，可能已过期）" : ""}`
+      : "✅";
+    reportRows[index] = `| ${clean(tool.name)} | ${tool.repo} | ${info.tag ?? "—"} | ${info.relTime} | ${status}${divergence} |`;
+
+    // endpoint 徽章数据（badge: endpoint）
+    if (modeOf(tool) === "endpoint" && info.tag) {
+      const badgeJson = {
+        schemaVersion: 1,
+        label: "最新稳定 tag",
+        message: info.tag,
+        color: "blue",
+        link: [`https://github.com/${tool.repo}/tags`],
+      };
+      if (!DRY_RUN) {
+        mkdirSync(BADGES_DIR, { recursive: true });
+        writeFileSync(join(BADGES_DIR, `${keyOf(tool)}.json`), JSON.stringify(badgeJson, null, 2) + "\n");
+      }
+    }
+
+    process.stdout.write(`  ${info.issue ? "⚠" : "✓"} ${tool.repo.padEnd(26)} ${String(info.tag ?? "—").padEnd(14)} ${info.relTime}\n`);
+    return { tool, info };
+  }).then((pairs) => {
+    for (const p of pairs) if (p) results.set(p.tool.repo, p.info);
+  });
+
+  const orderedReportRows = reportRows.filter(Boolean);
 
   // 生成 README 区块并写回
   const readme = readFileSync(README_PATH, "utf8");
@@ -470,6 +675,7 @@ async function main() {
       release_url: info.url ?? null,
       badge_url: null,
       issue: info.issue ?? null,
+      stale: info.stale ? true : undefined,
       note: info.apiLatestEndpointTag && info.tag && info.apiLatestEndpointTag !== info.tag
         ? `GitHub /releases/latest 指向 ${info.apiLatestEndpointTag}`
         : null,
@@ -483,10 +689,23 @@ async function main() {
     }
   }
 
+  // 全都抓不到（典型原因：未认证 API 配额耗尽、断网、token 失效）时拒绝写盘，
+  // 否则会把整张表覆盖成 "—"。部分失败则已由快照回退兜底，可以安全写入。
+  if (issues.length === toolCount && stale.length === 0) {
+    throw new Error(
+      `所有 ${toolCount} 个仓库均抓取失败且无历史快照可回退，拒绝写入 README/data 以免破坏既有数据。` +
+        `常见原因：未设置 GITHUB_TOKEN 导致未认证配额（60 次/小时）耗尽。首个错误：${issues[0]}`,
+    );
+  }
+
   if (!DRY_RUN) {
     mkdirSync(DATA_DIR, { recursive: true });
     writeFileSync(README_PATH, updatedReadme);
     writeFileSync(DATA_PATH, JSON.stringify(snapshot, null, 2) + "\n");
+  }
+
+  if (stale.length) {
+    process.stdout.write(`\n⚠ 以下 ${stale.length} 个仓库沿用上次快照的版本（本次抓取失败）：${stale.join("、")}\n`);
   }
 
   // Markdown 报告（CI 中 tee 到 $GITHUB_STEP_SUMMARY）
@@ -499,11 +718,18 @@ async function main() {
   lines.push("");
   lines.push("| 工具 | 仓库 | 最新稳定版本（tag） | 最近发布 | 状态 |");
   lines.push("| :-- | :-- | :-- | :--: | :-- |");
-  lines.push(...reportRows);
+  lines.push(...orderedReportRows);
   console.log(lines.join("\n"));
 }
 
-main().catch((err) => {
-  console.error(`FATAL: ${err.message}`);
-  process.exit(1);
-});
+const invokedDirectly =
+  process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url));
+
+if (invokedDirectly) {
+  main().catch((err) => {
+    console.error(`FATAL: ${err.message}`);
+    process.exit(1);
+  });
+}
+
+export { parseConfig, parseVersion, cmpVersion, relTime, clean, badgeUrl, buildRow, buildSection, spliceReadme, latestRelease, latestTag, main };

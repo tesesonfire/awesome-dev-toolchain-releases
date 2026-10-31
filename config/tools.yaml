@@ -32,6 +32,14 @@ categories:
         repo: denoland/deno
         description: 默认安全的 JavaScript / TypeScript 运行时。
 
+  - id: node-toolchain
+    name: Node.js 工具链
+    tools:
+      - name: pnpm
+        repo: pnpm/pnpm
+        description: 节省磁盘与网络的内容寻址式包管理器（npm 的替代实现）。
+        note: 同时维护 v10 / v11 / v12 多条发布线；本表按 semver 取最高稳定版本，而非最新发布时间
+
   - id: python-toolchain
     name: Python 工具链
     tools:

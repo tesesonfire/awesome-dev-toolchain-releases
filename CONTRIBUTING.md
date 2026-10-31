@@ -55,15 +55,33 @@ categories:
 ### 3. 重新生成 README 表格并提交
 
 ```bash
-export GITHUB_TOKEN=ghp_xxx                 # 可选，提升 API 限额
-node scripts/update_releases.mjs --dry-run  # 预览报告
-node scripts/update_releases.mjs            # 写入 README + data/
+npm test                                    # 纯逻辑单测，无需 token / 网络
+export GITHUB_TOKEN=ghp_xxx                 # 可选，提升 API 限额（未认证仅 60 次/小时）
+npm run update:dry                          # 预览报告
+npm run update                              # 写入 README + data/
 git add config/tools.yaml README.md data
 git commit -m "feat(tools): track eza"
 git push
 ```
 
 也可以**不本地运行**：PR 合并到 main 后，push 事件（匹配 `config/tools.yaml`）或下一次定时任务会自动重新生成表格并提交。
+
+## 配置校验规则（脚本会强制检查）
+
+脚本在抓取前先校验 `config/tools.yaml`，不满足任一条会立即失败（`FATAL: ...`，退出码 1），不会产出半成品表格：
+
+| 规则 | 原因 |
+| :-- | :-- |
+| 必填 `name` / `repo` / `description` | 缺失会导致表格列错位 |
+| `repo` 形如 `owner/repo` 且不得重复 | 同一仓库不应出现两行 |
+| `name` 不得重复（大小写不敏感） | 工具名同时用作徽章 alt 文本，重名难以辨识 |
+| 分类 `id` 不得重复；顶层只允许 `categories` | 防止拼写错误静默失效 |
+| 工具条目只允许文档里的 7 个字段 | 同上，例如把 `tag_prefix` 误写成 `tag_prefx` |
+| `description` / `note` / 分类 `name` 不含竖线、换行、`<!--` | 会破坏 Markdown 表格与标记区块 |
+| `badge` ∈ {`release`, `tag`, `endpoint`} | 其他值生成不出徽章 URL |
+| `include_prereleases` 必须是 `true` / `false` | YAML 子集解析器只识别这两个布尔字面量 |
+| `tag_prefix` 非空且不含空白、`?`、`#` | 会破坏 `matching-refs` 请求 URL |
+| `badge: endpoint` 必须同时给 `tag_prefix` | 否则会扫描全部 refs 导致选错版本 |
 
 ## 修改或移除一个工具
 
@@ -77,4 +95,6 @@ git push
 2. 版本数据只允许来自 GitHub Releases / Tags API 与 Shields.io 对应端点，不引入第三方聚合数据；
 3. "最近发布"的相对时间口径由 `scripts/update_releases.mjs` 的 `relTime()` 统一实现（24 小时内 / N 天前 / MM-DD）；
 4. Actions 工作流保持单文件、少量步骤；复杂逻辑全部收敛在脚本中，便于本地复现；
-5. 对无 GitHub Releases 的工具，条目必须带 `note` 说明降级方式，不得用 GitHub 数据冒充其官方发布渠道（如 conda 的 anaconda.org）。
+5. 对无 GitHub Releases 的工具，条目必须带 `note` 说明降级方式，不得用 GitHub 数据冒充其官方发布渠道（如 conda 的 anaconda.org）；
+6. 纯逻辑（YAML 解析、semver 排序、时间口径、配置校验、并发/重试）改动必须同步更新 `tests/update_releases.test.mjs` —— CI 会先跑单测再刷新数据；
+7. 单个仓库抓取失败时必须沿用上次快照并标注，任何改动都不得让"限流 / 网络抖动"把已发布版本冲成 `—`。

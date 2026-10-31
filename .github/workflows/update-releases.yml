@@ -23,7 +23,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 先跑纯逻辑单测（零依赖、不需要 token），避免把解析/排序/渲染回归带进自动提交
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run unit tests
+        run: node --test tests/update_releases.test.mjs
+
   update:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,6 +48,7 @@ jobs:
       - name: Fetch releases and regenerate README
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          UPDATE_CONCURRENCY: 4
         run: node scripts/update_releases.mjs | tee "${GITHUB_STEP_SUMMARY}"
         shell: bash
 

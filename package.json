@@ -1,0 +1,16 @@
+{
+  "name": "awesome-dev-toolchain-releases",
+  "version": "1.0.0",
+  "private": true,
+  "description": "集中追踪主流开发工具链的最新 Release 版本与发布时间",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "update": "node scripts/update_releases.mjs",
+    "update:dry": "node scripts/update_releases.mjs --dry-run",
+    "test": "node --test tests/update_releases.test.mjs"
+  }
+}
