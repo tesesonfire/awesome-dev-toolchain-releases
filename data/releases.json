@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-04T20:30:45.109Z",
+  "checked_at": "2026-11-05T08:22:26.197Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -73,9 +73,9 @@
     {
       "repo": "pnpm/pnpm",
       "category": "Node.js 工具链",
-      "tag": "v12.17.0",
-      "published_at": "2026-10-30T14:24:43Z",
-      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.17.0",
+      "tag": "v12.18.0",
+      "published_at": "2026-11-05T00:56:45Z",
+      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.18.0",
       "badge_url": "https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
@@ -106,9 +106,9 @@
     {
       "repo": "nvm-sh/nvm",
       "category": "版本管理器",
-      "tag": "v0.40.8",
-      "published_at": "2026-09-21T02:26:02Z",
-      "release_url": "https://github.com/nvm-sh/nvm/releases/tag/v0.40.8",
+      "tag": "v0.41.0",
+      "published_at": "2026-11-04T21:25:25Z",
+      "release_url": "https://github.com/nvm-sh/nvm/releases/tag/v0.41.0",
       "badge_url": "https://img.shields.io/github/v/release/nvm-sh/nvm?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
