@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-05T20:46:38.029Z",
+  "checked_at": "2026-11-06T08:25:41.213Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -183,9 +183,9 @@
     {
       "repo": "mikefarah/yq",
       "category": "通用 CLI",
-      "tag": "v4.54.1",
-      "published_at": "2026-09-29T04:22:30Z",
-      "release_url": "https://github.com/mikefarah/yq/releases/tag/v4.54.1",
+      "tag": "v4.54.2",
+      "published_at": "2026-11-06T02:41:15Z",
+      "release_url": "https://github.com/mikefarah/yq/releases/tag/v4.54.2",
       "badge_url": "https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
