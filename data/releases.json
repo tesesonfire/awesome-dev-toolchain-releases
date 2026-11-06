@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-06T08:25:41.213Z",
+  "checked_at": "2026-11-06T20:02:39.171Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -95,9 +95,9 @@
     {
       "repo": "conda/conda",
       "category": "Python 工具链",
-      "tag": "26.9.4",
-      "published_at": "2026-10-21T12:09:11Z",
-      "release_url": "https://github.com/conda/conda/releases/tag/26.9.4",
+      "tag": "26.10.0",
+      "published_at": "2026-11-06T16:46:52Z",
+      "release_url": "https://github.com/conda/conda/releases/tag/26.10.0",
       "badge_url": "https://img.shields.io/github/v/release/conda/conda?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
