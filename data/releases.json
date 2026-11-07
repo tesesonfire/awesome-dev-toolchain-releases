@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-06T20:02:39.171Z",
+  "checked_at": "2026-11-07T07:41:38.812Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -150,9 +150,9 @@
     {
       "repo": "sharkdp/fd",
       "category": "通用 CLI",
-      "tag": "v10.5.1",
-      "published_at": "2026-11-04T09:10:35Z",
-      "release_url": "https://github.com/sharkdp/fd/releases/tag/v10.5.1",
+      "tag": "v10.5.2",
+      "published_at": "2026-11-07T07:23:35Z",
+      "release_url": "https://github.com/sharkdp/fd/releases/tag/v10.5.2",
       "badge_url": "https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
