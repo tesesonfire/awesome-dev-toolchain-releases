@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-07T07:41:38.812Z",
+  "checked_at": "2026-11-07T18:13:43.249Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -194,9 +194,9 @@
     {
       "repo": "junegunn/fzf",
       "category": "通用 CLI",
-      "tag": "v0.74.5",
-      "published_at": "2026-10-11T02:39:32Z",
-      "release_url": "https://github.com/junegunn/fzf/releases/tag/v0.74.5",
+      "tag": "v0.75.0",
+      "published_at": "2026-11-07T12:03:59Z",
+      "release_url": "https://github.com/junegunn/fzf/releases/tag/v0.75.0",
       "badge_url": "https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
