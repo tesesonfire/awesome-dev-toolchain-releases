@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-10T08:45:55.623Z",
+  "checked_at": "2026-11-10T20:34:19.792Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -18,8 +18,8 @@
     {
       "repo": "golang/go",
       "category": "语言运行时",
-      "tag": "go1.27.3",
-      "published_at": "2026-10-20T01:26:06Z",
+      "tag": "go1.27.4",
+      "published_at": "2026-11-10T16:47:23Z",
       "release_url": "https://github.com/golang/go/tags",
       "badge_url": "https://img.shields.io/github/v/tag/golang/go?sort=semver&display_name=tag",
       "issue": null,
