@@ -42,7 +42,7 @@
 
 | 工具 | 最新版本 | 最近发布 | 仓库 | 简介 |
 | :-- | :-- | :--: | :-- | :-- |
-| [pnpm](https://github.com/pnpm/pnpm) | [![pnpm latest version](https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag)](https://github.com/pnpm/pnpm/releases) | `24 小时内` | [`pnpm/pnpm`](https://github.com/pnpm/pnpm) | 节省磁盘与网络的内容寻址式包管理器（npm 的替代实现）。 <br>📌 同时维护 v10 / v11 / v12 多条发布线；本表按 semver 取最高稳定版本，而非最新发布时间 |
+| [pnpm](https://github.com/pnpm/pnpm) | [![pnpm latest version](https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag)](https://github.com/pnpm/pnpm/releases) | `1 天前` | [`pnpm/pnpm`](https://github.com/pnpm/pnpm) | 节省磁盘与网络的内容寻址式包管理器（npm 的替代实现）。 <br>📌 同时维护 v10 / v11 / v12 多条发布线；本表按 semver 取最高稳定版本，而非最新发布时间 |
 
 ### Python 工具链
 
@@ -55,7 +55,7 @@
 
 | 工具 | 最新版本 | 最近发布 | 仓库 | 简介 |
 | :-- | :-- | :--: | :-- | :-- |
-| [nvm](https://github.com/nvm-sh/nvm) | [![nvm latest version](https://img.shields.io/github/v/release/nvm-sh/nvm?sort=semver&display_name=tag)](https://github.com/nvm-sh/nvm/releases) | `7 天前` | [`nvm-sh/nvm`](https://github.com/nvm-sh/nvm) | POSIX（sh/bash/zsh）环境下的 Node.js 版本管理器。 |
+| [nvm](https://github.com/nvm-sh/nvm) | [![nvm latest version](https://img.shields.io/github/v/release/nvm-sh/nvm?sort=semver&display_name=tag)](https://github.com/nvm-sh/nvm/releases) | `8 天前` | [`nvm-sh/nvm`](https://github.com/nvm-sh/nvm) | POSIX（sh/bash/zsh）环境下的 Node.js 版本管理器。 |
 | [nvm-windows](https://github.com/coreybutler/nvm-windows) | [![nvm-windows latest version](https://img.shields.io/github/v/release/coreybutler/nvm-windows?sort=semver&display_name=tag)](https://github.com/coreybutler/nvm-windows/releases) | `10-02` | [`coreybutler/nvm-windows`](https://github.com/coreybutler/nvm-windows) | Windows 下的 Node.js 版本管理器（与 nvm-sh 相互独立的实现）。 <br>📌 Windows 原生版本，管理工具为 nvm.exe / nvm-no.exe |
 
 ### GitHub 生态
@@ -69,13 +69,13 @@
 | 工具 | 最新版本 | 最近发布 | 仓库 | 简介 |
 | :-- | :-- | :--: | :-- | :-- |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | [![ripgrep latest version](https://img.shields.io/github/v/release/BurntSushi/ripgrep?sort=semver&display_name=tag)](https://github.com/BurntSushi/ripgrep/releases) | `07-15` | [`BurntSushi/ripgrep`](https://github.com/BurntSushi/ripgrep) | 面向目录递归的高速正则搜索工具（rg）。 |
-| [fd](https://github.com/sharkdp/fd) | [![fd latest version](https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag)](https://github.com/sharkdp/fd/releases) | `5 天前` | [`sharkdp/fd`](https://github.com/sharkdp/fd) | 简单、快速的 find 替代品。 |
+| [fd](https://github.com/sharkdp/fd) | [![fd latest version](https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag)](https://github.com/sharkdp/fd/releases) | `6 天前` | [`sharkdp/fd`](https://github.com/sharkdp/fd) | 简单、快速的 find 替代品。 |
 | [bat](https://github.com/sharkdp/bat) | [![bat latest version](https://img.shields.io/github/v/release/sharkdp/bat?sort=semver&display_name=tag)](https://github.com/sharkdp/bat/releases) | `2025-12-02` | [`sharkdp/bat`](https://github.com/sharkdp/bat) | 带语法高亮与 Git 集成的 cat 克隆。 |
 | [jq](https://github.com/jqlang/jq) | [![jq latest version](https://img.shields.io/github/v/release/jqlang/jq?sort=semver&display_name=tag)](https://github.com/jqlang/jq/releases) | `06-20` | [`jqlang/jq`](https://github.com/jqlang/jq) | 轻量级命令行 JSON 处理器。 |
-| [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `3 天前` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
+| [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `4 天前` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
 | [fzf](https://github.com/junegunn/fzf) | [![fzf latest version](https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag)](https://github.com/junegunn/fzf/releases) | `5 天前` | [`junegunn/fzf`](https://github.com/junegunn/fzf) | 通用命令行模糊搜索器，可对接任意列表输入。 |
 
-> 🕒 数据更新时间（UTC）：**2026-11-12 21:01** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
+> 🕒 数据更新时间（UTC）：**2026-11-13 08:38** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
 >
 > 时间口径：24 小时内 → `24 小时内`；30 天内 → `N 天前`；更早 → `MM-DD`（跨年显示 `YYYY-MM-DD`）。
 > “最新版本”为 semver 排序最高的稳定版本（不含预发布）。无 GitHub Releases 的工具（Go、Python）基于最新稳定 tag，时间为该 tag 的打标/提交时间。
