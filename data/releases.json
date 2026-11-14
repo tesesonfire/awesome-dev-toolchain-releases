@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-13T20:37:39.700Z",
+  "checked_at": "2026-11-14T07:56:35.421Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -73,9 +73,9 @@
     {
       "repo": "pnpm/pnpm",
       "category": "Node.js 工具链",
-      "tag": "v12.20.0",
-      "published_at": "2026-11-12T00:23:41Z",
-      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.20.0",
+      "tag": "v12.21.0",
+      "published_at": "2026-11-13T21:02:22Z",
+      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.21.0",
       "badge_url": "https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
