@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-17T09:40:44.611Z",
+  "checked_at": "2026-11-17T21:52:25.682Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -73,9 +73,9 @@
     {
       "repo": "pnpm/pnpm",
       "category": "Node.js 工具链",
-      "tag": "v12.21.0",
-      "published_at": "2026-11-13T21:02:22Z",
-      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.21.0",
+      "tag": "v12.22.0",
+      "published_at": "2026-11-17T20:20:31Z",
+      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.22.0",
       "badge_url": "https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
@@ -84,9 +84,9 @@
     {
       "repo": "astral-sh/uv",
       "category": "Python 工具链",
-      "tag": "0.13.8",
-      "published_at": "2026-11-12T17:03:07Z",
-      "release_url": "https://github.com/astral-sh/uv/releases/tag/0.13.8",
+      "tag": "0.13.9",
+      "published_at": "2026-11-17T09:57:55Z",
+      "release_url": "https://github.com/astral-sh/uv/releases/tag/0.13.9",
       "badge_url": "https://img.shields.io/github/v/release/astral-sh/uv?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
