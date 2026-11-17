@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-16T22:59:31.345Z",
+  "checked_at": "2026-11-17T09:40:44.611Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -40,9 +40,9 @@
     {
       "repo": "nodejs/node",
       "category": "语言运行时",
-      "tag": "v27.0.0-alpha.0.1.0",
-      "published_at": "2026-11-12T13:35:13Z",
-      "release_url": "https://github.com/nodejs/node/releases/tag/v27.0.0-alpha.0.1.0",
+      "tag": "v27.0.0-alpha.0.1.1",
+      "published_at": "2026-11-17T03:48:38Z",
+      "release_url": "https://github.com/nodejs/node/releases/tag/v27.0.0-alpha.0.1.1",
       "badge_url": "https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
