@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-18T21:32:14.036Z",
+  "checked_at": "2026-11-19T09:20:02.333Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -51,9 +51,9 @@
     {
       "repo": "oven-sh/bun",
       "category": "语言运行时",
-      "tag": "bun-v1.4.4",
-      "published_at": "2026-10-22T10:11:32Z",
-      "release_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.4",
+      "tag": "bun-v1.4.5",
+      "published_at": "2026-11-19T08:47:28Z",
+      "release_url": "https://github.com/oven-sh/bun/releases/tag/bun-v1.4.5",
       "badge_url": "https://img.shields.io/github/v/release/oven-sh/bun?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
