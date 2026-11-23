@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-22T20:27:12.802Z",
+  "checked_at": "2026-11-23T09:38:40.395Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -139,9 +139,9 @@
     {
       "repo": "BurntSushi/ripgrep",
       "category": "通用 CLI",
-      "tag": "15.2.0",
-      "published_at": "2026-07-15T16:26:10Z",
-      "release_url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
+      "tag": "16.0.0",
+      "published_at": "2026-11-22T22:59:48Z",
+      "release_url": "https://github.com/BurntSushi/ripgrep/releases/tag/16.0.0",
       "badge_url": "https://img.shields.io/github/v/release/BurntSushi/ripgrep?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
