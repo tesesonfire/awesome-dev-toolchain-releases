@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-24T11:31:15.623Z",
+  "checked_at": "2026-11-24T23:13:40.254Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -84,9 +84,9 @@
     {
       "repo": "astral-sh/uv",
       "category": "Python 工具链",
-      "tag": "0.13.9",
-      "published_at": "2026-11-17T09:57:55Z",
-      "release_url": "https://github.com/astral-sh/uv/releases/tag/0.13.9",
+      "tag": "0.13.10",
+      "published_at": "2026-11-24T21:15:44Z",
+      "release_url": "https://github.com/astral-sh/uv/releases/tag/0.13.10",
       "badge_url": "https://img.shields.io/github/v/release/astral-sh/uv?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
