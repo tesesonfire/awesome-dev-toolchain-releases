@@ -34,8 +34,8 @@
 | [Rust](https://github.com/rust-lang/rust) | [![Rust latest version](https://img.shields.io/github/v/release/rust-lang/rust?sort=semver&display_name=tag)](https://github.com/rust-lang/rust/releases) | `12 天前` | [`rust-lang/rust`](https://github.com/rust-lang/rust) | 系统级编程语言，注重性能、可靠性与内存安全。 |
 | [Go](https://github.com/golang/go) | [![Go latest version](https://img.shields.io/github/v/tag/golang/go?sort=semver&display_name=tag)](https://github.com/golang/go/tags) | `14 天前` | [`golang/go`](https://github.com/golang/go) | Google 开源的静态类型编译型语言。 <br>📌 该项目不发布 GitHub Releases（仅 tags），徽章基于 tag 渲染 |
 | [Python](https://github.com/python/cpython) | [![Python latest version](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftesesonfire%2Fawesome-dev-toolchain-releases%2Fmain%2Fdata%2Fbadges%2Fpython-cpython.json)](https://github.com/python/cpython/tags) | `10-25` | [`python/cpython`](https://github.com/python/cpython) | CPython 解释器，Python 语言的官方参考实现。 <br>📌 主要分发渠道为 python.org；GitHub 上无 Releases（仅 tags），徽章由本仓库 Actions 依据最新稳定 tag 生成 |
-| [Node.js](https://github.com/nodejs/node) | [![Node.js latest version](https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag)](https://github.com/nodejs/node/releases) | `7 天前` | [`nodejs/node`](https://github.com/nodejs/node) | 基于 V8 的 JavaScript 运行时。 |
-| [Bun](https://github.com/oven-sh/bun) | [![Bun latest version](https://img.shields.io/github/v/release/oven-sh/bun?sort=semver&display_name=tag)](https://github.com/oven-sh/bun/releases) | `5 天前` | [`oven-sh/bun`](https://github.com/oven-sh/bun) | 一体化 JavaScript 运行时与工具链（运行、打包、测试、包管理）。 |
+| [Node.js](https://github.com/nodejs/node) | [![Node.js latest version](https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag)](https://github.com/nodejs/node/releases) | `8 天前` | [`nodejs/node`](https://github.com/nodejs/node) | 基于 V8 的 JavaScript 运行时。 |
+| [Bun](https://github.com/oven-sh/bun) | [![Bun latest version](https://img.shields.io/github/v/release/oven-sh/bun?sort=semver&display_name=tag)](https://github.com/oven-sh/bun/releases) | `6 天前` | [`oven-sh/bun`](https://github.com/oven-sh/bun) | 一体化 JavaScript 运行时与工具链（运行、打包、测试、包管理）。 |
 | [Deno](https://github.com/denoland/deno) | [![Deno latest version](https://img.shields.io/github/v/release/denoland/deno?sort=semver&display_name=tag)](https://github.com/denoland/deno/releases) | `10-21` | [`denoland/deno`](https://github.com/denoland/deno) | 默认安全的 JavaScript / TypeScript 运行时。 |
 
 ### Node.js 工具链
@@ -62,20 +62,20 @@
 
 | 工具 | 最新版本 | 最近发布 | 仓库 | 简介 |
 | :-- | :-- | :--: | :-- | :-- |
-| [GitHub CLI](https://github.com/cli/cli) | [![GitHub CLI latest version](https://img.shields.io/github/v/release/cli/cli?sort=semver&display_name=tag)](https://github.com/cli/cli/releases) | `6 天前` | [`cli/cli`](https://github.com/cli/cli) | GitHub 官方命令行工具 gh，覆盖 PR、Issue、Actions 等工作流。 |
+| [GitHub CLI](https://github.com/cli/cli) | [![GitHub CLI latest version](https://img.shields.io/github/v/release/cli/cli?sort=semver&display_name=tag)](https://github.com/cli/cli/releases) | `7 天前` | [`cli/cli`](https://github.com/cli/cli) | GitHub 官方命令行工具 gh，覆盖 PR、Issue、Actions 等工作流。 |
 
 ### 通用 CLI
 
 | 工具 | 最新版本 | 最近发布 | 仓库 | 简介 |
 | :-- | :-- | :--: | :-- | :-- |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | [![ripgrep latest version](https://img.shields.io/github/v/release/BurntSushi/ripgrep?sort=semver&display_name=tag)](https://github.com/BurntSushi/ripgrep/releases) | `2 天前` | [`BurntSushi/ripgrep`](https://github.com/BurntSushi/ripgrep) | 面向目录递归的高速正则搜索工具（rg）。 |
-| [fd](https://github.com/sharkdp/fd) | [![fd latest version](https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag)](https://github.com/sharkdp/fd/releases) | `17 天前` | [`sharkdp/fd`](https://github.com/sharkdp/fd) | 简单、快速的 find 替代品。 |
+| [fd](https://github.com/sharkdp/fd) | [![fd latest version](https://img.shields.io/github/v/release/sharkdp/fd?sort=semver&display_name=tag)](https://github.com/sharkdp/fd/releases) | `18 天前` | [`sharkdp/fd`](https://github.com/sharkdp/fd) | 简单、快速的 find 替代品。 |
 | [bat](https://github.com/sharkdp/bat) | [![bat latest version](https://img.shields.io/github/v/release/sharkdp/bat?sort=semver&display_name=tag)](https://github.com/sharkdp/bat/releases) | `2025-12-02` | [`sharkdp/bat`](https://github.com/sharkdp/bat) | 带语法高亮与 Git 集成的 cat 克隆。 |
 | [jq](https://github.com/jqlang/jq) | [![jq latest version](https://img.shields.io/github/v/release/jqlang/jq?sort=semver&display_name=tag)](https://github.com/jqlang/jq/releases) | `06-20` | [`jqlang/jq`](https://github.com/jqlang/jq) | 轻量级命令行 JSON 处理器。 |
-| [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `15 天前` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
+| [yq](https://github.com/mikefarah/yq) | [![yq latest version](https://img.shields.io/github/v/release/mikefarah/yq?sort=semver&display_name=tag)](https://github.com/mikefarah/yq/releases) | `16 天前` | [`mikefarah/yq`](https://github.com/mikefarah/yq) | 命令行 YAML / XML / CSV 处理器（Go 实现）。 |
 | [fzf](https://github.com/junegunn/fzf) | [![fzf latest version](https://img.shields.io/github/v/release/junegunn/fzf?sort=semver&display_name=tag)](https://github.com/junegunn/fzf/releases) | `17 天前` | [`junegunn/fzf`](https://github.com/junegunn/fzf) | 通用命令行模糊搜索器，可对接任意列表输入。 |
 
-> 🕒 数据更新时间（UTC）：**2026-11-24 23:13** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
+> 🕒 数据更新时间（UTC）：**2026-11-25 10:18** · 由 [update-releases workflow](.github/workflows/update-releases.yml) 每 12 小时刷新；版本徽章由 Shields.io 实时渲染，不受本页缓存影响。
 >
 > 时间口径：24 小时内 → `24 小时内`；30 天内 → `N 天前`；更早 → `MM-DD`（跨年显示 `YYYY-MM-DD`）。
 > “最新版本”为 semver 排序最高的稳定版本（不含预发布）。无 GitHub Releases 的工具（Go、Python）基于最新稳定 tag，时间为该 tag 的打标/提交时间。
