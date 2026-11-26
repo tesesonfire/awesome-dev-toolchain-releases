@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-26T09:57:47.471Z",
+  "checked_at": "2026-11-26T22:31:21.381Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -46,7 +46,7 @@
       "badge_url": "https://img.shields.io/github/v/release/nodejs/node?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
-      "note": null
+      "note": "GitHub /releases/latest 指向 v27.0.0-alpha.0.2.0"
     },
     {
       "repo": "oven-sh/bun",
@@ -73,9 +73,9 @@
     {
       "repo": "pnpm/pnpm",
       "category": "Node.js 工具链",
-      "tag": "v12.23.0",
-      "published_at": "2026-11-22T13:22:32Z",
-      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.23.0",
+      "tag": "v12.24.0",
+      "published_at": "2026-11-26T14:31:19Z",
+      "release_url": "https://github.com/pnpm/pnpm/releases/tag/v12.24.0",
       "badge_url": "https://img.shields.io/github/v/release/pnpm/pnpm?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
