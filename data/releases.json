@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-27T10:02:13.349Z",
+  "checked_at": "2026-11-27T22:16:01.276Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -7,9 +7,9 @@
     {
       "repo": "rust-lang/rust",
       "category": "语言运行时",
-      "tag": "1.100.0",
-      "published_at": "2026-11-12T18:19:42Z",
-      "release_url": "https://github.com/rust-lang/rust/releases/tag/1.100.0",
+      "tag": "1.100.1",
+      "published_at": "2026-11-27T19:31:41Z",
+      "release_url": "https://github.com/rust-lang/rust/releases/tag/1.100.1",
       "badge_url": "https://img.shields.io/github/v/release/rust-lang/rust?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
