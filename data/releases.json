@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-27T22:16:01.276Z",
+  "checked_at": "2026-11-28T09:19:38.879Z",
   "source": "GitHub REST API (api.github.com)；版本展示由 Shields.io 渲染",
   "repo": "tesesonfire/awesome-dev-toolchain-releases",
   "tool_count": 18,
@@ -161,9 +161,9 @@
     {
       "repo": "sharkdp/bat",
       "category": "通用 CLI",
-      "tag": "v0.26.1",
-      "published_at": "2025-12-02T20:48:10Z",
-      "release_url": "https://github.com/sharkdp/bat/releases/tag/v0.26.1",
+      "tag": "v0.27.0",
+      "published_at": "2026-11-28T07:21:06Z",
+      "release_url": "https://github.com/sharkdp/bat/releases/tag/v0.27.0",
       "badge_url": "https://img.shields.io/github/v/release/sharkdp/bat?sort=semver&display_name=tag",
       "issue": null,
       "stale": false,
